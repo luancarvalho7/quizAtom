@@ -1,0 +1,153 @@
+
+*{
+      font-family: 'Poppins', sans-serif;
+
+}
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #000;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    margin: 0;
+}
+
+.quiz-container {
+  margin-top: 10px;
+    max-width: 400px;
+    margin: auto;
+background: rgb(14,14,14);
+background: linear-gradient(180deg, rgba(14,14,14,1) 0%, rgba(0,0,0,1) 100%);    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.3);
+}
+
+
+h1 {
+    font-weight: 700;
+}
+
+p {
+    font-weight: 400; /* Adjust weight as needed */
+}
+
+
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+#heading h1{
+line-height: 0.8;
+}
+
+.fontsyne{
+      font-family: 'Syne', sans-serif;
+
+}
+.highlight {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    color: #ffcc00;
+    font-size: 1.9rem;
+}
+
+
+
+.question {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.answer {
+  
+  box-sizing: border-box;
+  width: 100%;
+    background-color: #000;
+    border: 1px solid #fff;
+    color: #fff;
+    padding: 15px 20px;
+    margin: 10px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap: 20px;
+    text-align: left;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.answer-number {
+  font-style: italic;
+}
+.answer:hover {
+    background-color: #444;
+    border-color: #ffcc00;
+}
+
+.answer.correct {
+    background-color: #4CAF50;
+    border-color: #4CAF50;
+}
+
+.answer.incorrect {
+    background-color: #F44336;
+    border-color: #F44336;
+}
+
+#score {
+    font-size: 24px;
+    margin-top: 20px;
+}
+
+.restart, .continue {
+  margin: 0px 3px;
+    background-color: #ffcc00;
+    color: #000;
+    font-weight: 600;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+.restart:hover {
+    background-color: #e6b800;
+}
+
+.quiz-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.timer,
+.question-count {
+    font-size: 14px;
+    color: #ffcc00;
+}
+
+.quiz-footer {
+    margin-top: 30px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 18px;
+    color: #ffcc00;
+}
+
+.timer {
+    font-size: 18px;
+}
+
+.question-count {
+    font-size: 18px;
+}
