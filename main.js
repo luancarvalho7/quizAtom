@@ -301,7 +301,11 @@ function showScore() {
         continueButton.textContent = 'PROXIMA AULA ';
         continueButton.className = 'continue';
         continueButton.addEventListener('click', () => {
-            alert('Continuing to the next section!'); // Replace with your desired action
+
+            
+      const message = { type: 'FROM_IFRAME', content: 'Hello, Parent!' };
+       window.parent.postMessage(message, '*');
+
         });
         quiz.appendChild(continueButton);
     }
