@@ -106,7 +106,8 @@ function checkAnswer(selectedAnswer, selectedButton, questionData) {
     if (selectedAnswer.isCorrect) {
         selectedButton.classList.add('correct');
         score++;
-    } else {
+    }
+     else {
         selectedButton.classList.add('incorrect');
         highlightCorrectAnswer(questionData);
     }
@@ -129,12 +130,16 @@ function highlightCorrectAnswer(questionData) {
         }
     });
 }
+let userResults = [];
 
 function showScore() {
     const quiz = document.getElementById('quiz');
     quiz.innerHTML = '';
 
     const timeTaken = (new Date() - startTime) / 1000;
+
+    // Save the current user's result
+    userResults.push({ userID, score, timeTaken });
 
     const scoreText = document.createElement('div');
     scoreText.id = 'score';
@@ -158,6 +163,58 @@ function showScore() {
             window.parent.postMessage(message, '*');
         });
         quiz.appendChild(continueButton);
+    }
+
+    // Show the top 3 ranking
+    showRanking();
+
+    // Send the results to the server
+    sendResults();
+}
+
+function showRanking() {
+    // Sort the results by score and time taken
+    userResults.sort((a, b) => {
+        if (b.score === a.score) {
+            return a.timeTaken - b.timeTaken;
+        }
+        return b.score - a.score;
+    });
+
+    const ranking = document.createElement('div');
+    ranking.id = 'ranking';
+    ranking.innerHTML = '<h2>Top 3 Ranking</h2>';
+
+    // Display the top 3 users
+    userResults.slice(0, 3).forEach((result, index) => {
+        const resultText = document.createElement('div');
+        resultText.className = 'ranking-entry';
+        resultText.innerHTML = `${index + 1}. ${result.userID} - ${result.score} pontos em ${result.timeTaken.toFixed(2)} segundos`;
+        ranking.appendChild(resultText);
+    });
+
+    const quiz = document.getElementById('quiz');
+    quiz.appendChild(ranking);
+}
+
+async function sendResults() {
+    try {
+        const response = await fetch('https://n8n.workez.online/webhook-test/204f4428-ce8f-48b1-89c1-e9b916246d91', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userResults)
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+
+        const result = await response.json();
+        console.log('Results successfully sent:', result);
+    } catch (error) {
+        console.error('There has been a problem with your fetch operation:', error);
     }
 }
 
