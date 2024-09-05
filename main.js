@@ -199,7 +199,7 @@ function showRanking() {
 
 async function sendResults() {
     try {
-        const response = await fetch('https://n8n.workez.online/webhook-test/204f4428-ce8f-48b1-89c1-e9b916246d91', {
+        const response = await fetch('https://n8n.workez.online/webhook-test/c043d8e9-623d-40a1-8335-ccc5393c8d0d', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
