@@ -1,32 +1,18 @@
-// Função para obter parâmetros da URL
+// Function to get the value of a URL parameter
 function getURLParameter(name) {
     return new URLSearchParams(window.location.search).get(name);
 }
 
-// Captura os parâmetros da URL
+// Get the parameters uID and vID
 const userID = getURLParameter('uID');
 const videoUrl = getURLParameter('vUrl');
 
+// Log the results to verify
 console.log("UserID:", userID);
 console.log("videoUrl:", videoUrl);
 
 let xquizData = [];
 
-// Variável para armazenar o valor de `sub`
-let jwtSub = null;
-
-// Evento para capturar a mensagem do iframe
-window.addEventListener('message', function(event) {
-    if (event.data && event.data.sub) {
-        jwtSub = event.data.sub;
-        console.log("JWT Sub:", jwtSub);
-
-        // Agora você pode usar `jwtSub` junto com os outros dados
-        getData(); // Inicia o quiz após obter o valor de `sub`
-    }
-}, false);
-
-// Função para buscar os dados do quiz
 async function getData() {
     try {
         const response = await fetch(`https://webhook.workez.online/webhook/findQuiz?url=${videoUrl}`);
@@ -35,19 +21,24 @@ async function getData() {
         }
         const data = await response.json();
 
+        // Log the data to understand its structure
         console.log("Fetched data:", data);
 
-        xquizData = data[0].jQuiz.questions;
+            xquizData = data[0].jQuiz.questions; 
 
         console.log("Quiz Data:", xquizData);
 
+        // Start the quiz only after data is loaded
         startQuiz();
     } catch (error) {
         console.error('There has been a problem with your fetch operation:', error);
     }
 }
 
-// Função para iniciar o quiz
+document.addEventListener('DOMContentLoaded', () => {
+    getData(); // Fetch data and start quiz
+});
+
 function startQuiz() {
     if (!xquizData || xquizData.length === 0) {
         console.error('Quiz data is empty or not defined. Cannot start quiz.');
@@ -56,19 +47,18 @@ function startQuiz() {
 
     currentQuestionIndex = 0;
     score = 0;
-    hasAnswered = false;
+    hasAnswered = false; // Reset the flag when the quiz starts
     startTime = new Date();
-    xquizData = shuffle(xquizData);
+    xquizData = shuffle(xquizData); // Shuffle the questions
     xquizData.forEach(question => {
-        question.answers = shuffle(question.answers);
+        question.answers = shuffle(question.answers); // Shuffle the answers within each question
     });
     loadQuestion();
 }
 
-// Função para carregar as perguntas
 function loadQuestion() {
-    if (!xquizData || xquizData.length === 0) return;
-    hasAnswered = false;
+    if (!xquizData || xquizData.length === 0) return; // Prevent loading if there's no data
+    hasAnswered = false; // Reset the flag for the new question
     const quiz = document.getElementById('quiz');
     quiz.innerHTML = '';
 
@@ -104,19 +94,20 @@ function loadQuestion() {
     });
 }
 
-// Função para verificar a resposta
 function checkAnswer(selectedAnswer, selectedButton, questionData) {
-    if (hasAnswered) return;
+    if (hasAnswered) return; // Exit the function if an answer has already been selected
 
-    hasAnswered = true;
+    hasAnswered = true; // Set the flag to true to prevent further clicks
 
+    // Disable all buttons after an answer is selected
     const buttons = document.querySelectorAll('.answer');
     buttons.forEach(button => button.classList.add('disabled'));
 
     if (selectedAnswer.isCorrect) {
         selectedButton.classList.add('correct');
         score++;
-    } else {
+    }
+     else {
         selectedButton.classList.add('incorrect');
         highlightCorrectAnswer(questionData);
     }
@@ -139,16 +130,15 @@ function highlightCorrectAnswer(questionData) {
         }
     });
 }
-
 let userResults = [];
 
-// Função para mostrar a pontuação
 function showScore() {
     const quiz = document.getElementById('quiz');
     quiz.innerHTML = '';
 
     const timeTaken = (new Date() - startTime) / 1000;
 
+    // Save the current user's result
     userResults.push({ userID, score, timeTaken });
 
     const scoreText = document.createElement('div');
@@ -156,12 +146,14 @@ function showScore() {
     scoreText.innerHTML = `Você acertou <br><span class="highlight">${score}/${xquizData.length}</span> <br>em <br><span class="highlight"> ${timeTaken.toFixed(2)} </span> segundos`;
     quiz.appendChild(scoreText);
 
+    // Add a restart button
     const restartButton = document.createElement('button');
     restartButton.textContent = 'REINICIAR QUIZ';
     restartButton.className = 'restart';
     restartButton.addEventListener('click', startQuiz);
     quiz.appendChild(restartButton);
 
+    // Add a continue button if the score is at least 4/5
     if (score >= 4) {
         const continueButton = document.createElement('button');
         continueButton.textContent = 'PROXIMA AULA ';
@@ -173,12 +165,15 @@ function showScore() {
         quiz.appendChild(continueButton);
     }
 
+    // Show the top 3 ranking
     showRanking();
+
+    // Send the results to the server
     sendResults();
 }
 
-// Função para mostrar o ranking
 function showRanking() {
+    // Sort the results by score and time taken
     userResults.sort((a, b) => {
         if (b.score === a.score) {
             return a.timeTaken - b.timeTaken;
@@ -190,6 +185,7 @@ function showRanking() {
     ranking.id = 'ranking';
     ranking.innerHTML = '<h2>Top 3 Ranking</h2>';
 
+    // Display the top 3 users
     userResults.slice(0, 3).forEach((result, index) => {
         const resultText = document.createElement('div');
         resultText.className = 'ranking-entry';
@@ -201,10 +197,9 @@ function showRanking() {
     quiz.appendChild(ranking);
 }
 
-// Função para enviar os resultados para o servidor
 async function sendResults() {
     try {
-        const response = await fetch('https://n8n.workez.online/webhook-test/c043d8e9-623d-40a1-8335-ccc5393c8d0d', {
+        const response = await fetch('https://n8n.workez.online/webhook-test/204f4428-ce8f-48b1-89c1-e9b916246d91', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -223,7 +218,7 @@ async function sendResults() {
     }
 }
 
-// Função para embaralhar um array
+// Utility function to shuffle array elements
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
