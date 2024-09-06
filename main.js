@@ -1,15 +1,19 @@
-// Function to get the value of a URL parameter
+// Função para obter o valor de um parâmetro da URL
 function getURLParameter(name) {
     return new URLSearchParams(window.location.search).get(name);
 }
 
-// Get the parameters uID and vID
+// Obter os parâmetros uID, vID, name e email
 const userID = getURLParameter('uID');
 const videoUrl = getURLParameter('vUrl');
+const userName = getURLParameter('name');
+const userEmail = getURLParameter('email');
 
 // Log the results to verify
 console.log("UserID:", userID);
 console.log("videoUrl:", videoUrl);
+console.log("UserName:", userName);
+console.log("UserEmail:", userEmail);
 
 let xquizData = [];
 
@@ -24,7 +28,7 @@ async function getData() {
         // Log the data to understand its structure
         console.log("Fetched data:", data);
 
-            xquizData = data[0].jQuiz.questions; 
+        xquizData = data[0].jQuiz.questions; 
 
         console.log("Quiz Data:", xquizData);
 
@@ -199,7 +203,7 @@ function showRanking() {
 
 async function sendResults() {
     try {
-        const response = await fetch('https://n8n.workez.online/webhook-test/c043d8e9-623d-40a1-8335-ccc5393c8d0d', {
+        const response = await fetch('https://n8n.workez.online/webhook-test/19e1fff5-d262-4735-ba5e-34cf8c553b70', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
