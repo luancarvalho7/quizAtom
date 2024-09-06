@@ -143,7 +143,7 @@ function showScore() {
     const timeTaken = (new Date() - startTime) / 1000;
 
     // Save the current user's result
-    userResults.push({ userID, score, timeTaken });
+    userResults.push({ userName, userEmail, score, timeTaken });
 
     const scoreText = document.createElement('div');
     scoreText.id = 'score';
@@ -193,7 +193,7 @@ function showRanking() {
     userResults.slice(0, 3).forEach((result, index) => {
         const resultText = document.createElement('div');
         resultText.className = 'ranking-entry';
-        resultText.innerHTML = `${index + 1}. ${result.userID} - ${result.score} pontos em ${result.timeTaken.toFixed(2)} segundos`;
+        resultText.innerHTML = `${index + 1}. ${result.userName} (${result.userEmail}) - ${result.score} pontos em ${result.timeTaken.toFixed(2)} segundos`;
         ranking.appendChild(resultText);
     });
 
