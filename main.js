@@ -221,6 +221,34 @@ async function sendResults() {
         console.error('There has been a problem with your fetch operation:', error);
     }
 }
+async function fetchFromSupabase() {
+    const SUPABASE_URL = 'https://mugpnilbgwfuzhtyizfh.supabase.co'; // Substitua pela sua URL do Supabase
+    const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11Z3BuaWxiZ3dmdXpodHlpemZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjM2NTY1MTYsImV4cCI6MjAzOTIzMjUxNn0.4_xLeNZKLXItRQt9vz4JOuxljPUL20AJESehddUZyuE'; // Substitua pela sua chave de API do Supabase
+    const TABLE_NAME = 'atm-quiz'; // Substitua pelo nome da sua tabela
+
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_NAME}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'apikey': SUPABASE_API_KEY,
+                'Authorization': `Bearer ${SUPABASE_API_KEY}`
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+
+        const data = await response.json();
+        console.log('Data fetched from Supabase:', data);
+    } catch (error) {
+        console.error('There has been a problem with your fetch operation:', error);
+    }
+}
+
+// Chamar a função para buscar dados do Supabase
+fetchFromSupabase();
 
 // Utility function to shuffle array elements
 function shuffle(array) {
