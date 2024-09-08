@@ -29,7 +29,7 @@ async function getData() {
         console.log("Fetched data:", data);
 
         xquizData = data[0].jQuiz.questions; 
-        quizRanking = data[0].quizRanking; // Assuming quizRanking is already an array
+        quizRanking = Array.isArray(data[0].quizRanking) ? data[0].quizRanking : [data[0].quizRanking]; // Ensure quizRanking is an array
 
         console.log("Quiz Data:", xquizData);
         console.log("Quiz Ranking:", quizRanking);
