@@ -1,41 +1,3 @@
-// const { createClient } = require('@supabase/supabase-js');
-// const fs = require('fs');
-// const path = require('path');
-
-// const SUPABASE_URL = 'https://mugpnilbgwfuzhtyizfh.supabase.co'; // Substitua pela sua URL do Supabase
-// const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11Z3BuaWxiZ3dmdXpodHlpemZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjM2NTY1MTYsImV4cCI6MjAzOTIzMjUxNn0.4_xLeNZKLXItRQt9vz4JOuxljPUL20AJESehddUZyuE'; // Substitua pela sua chave de API do Supabase
-// const TABLE_NAME = 'atm-quiz';
-
-// const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// async function fetchData() {
-//     console.log('Iniciando a consulta ao Supabase...');
-//     let { data, error } = await supabase
-//       .from(TABLE_NAME)
-//       .select('*')
-//       .limit(1); // Pegando apenas o primeiro vídeo
-  
-//     console.log('Resposta completa:', { data, error });
-  
-//     if (error) {
-//       console.error('Erro ao consultar o Supabase:', error);
-//     } else if (data.length === 0) {
-//       console.warn('Nenhum dado encontrado na tabela workez.');
-//     } else {
-//       console.log('Dados recebidos do Supabase:', data);
-//       const videoData = data[0];
-//       const quizRanking = videoData.quizRanking;
-//       const quisRankingGlobal = videoData.quisRankingGlobal;
-
-//       console.log('quizRanking:', quizRanking);
-//       console.log('quisRankingGlobal:', quisRankingGlobal);
-
-//       // Atualizar o ranking global e top 3
-//       updateRanking(quizRanking);
-//     }
-// }
-// fetchData();
-
 function getURLParameter(name) {
     return new URLSearchParams(window.location.search).get(name);
 }
@@ -53,6 +15,7 @@ console.log("UserName:", userName);
 console.log("UserEmail:", userEmail);
 
 let xquizData = [];
+let quizRanking = [];
 
 async function getData() {
     try {
@@ -66,8 +29,10 @@ async function getData() {
         console.log("Fetched data:", data);
 
         xquizData = data[0].jQuiz.questions; 
+        quizRanking = data[0].quizRanking;
 
         console.log("Quiz Data:", xquizData);
+        console.log("Quiz Ranking:", quizRanking);
 
         // Start the quiz only after data is loaded
         startQuiz();
@@ -214,23 +179,15 @@ function showScore() {
 }
 
 function showRanking() {
-    // Sort the results by score and time taken
-    userResults.sort((a, b) => {
-        if (b.score === a.score) {
-            return a.timeTaken - b.timeTaken;
-        }
-        return b.score - a.score;
-    });
-
     const ranking = document.createElement('div');
     ranking.id = 'ranking';
     ranking.innerHTML = '<h2>Top 3 Ranking</h2>';
 
-    // Display the top 3 users
-    userResults.slice(0, 3).forEach((result, index) => {
+    // Display the top 3 users from quizRanking
+    quizRanking.slice(0, 3).forEach((result, index) => {
         const resultText = document.createElement('div');
         resultText.className = 'ranking-entry';
-        resultText.innerHTML = `${index + 1}. ${result.userName} (${result.userEmail}) - ${result.score} pontos em ${result.timeTaken.toFixed(2)} segundos`;
+        resultText.innerHTML = `${index + 1}. ${result.name} (${result.email}) - ${result.score} pontos em ${result.time} segundos`;
         ranking.appendChild(resultText);
     });
 
@@ -259,35 +216,6 @@ async function sendResults() {
     }
 }
 
-async function fetchFromSupabase() {
-    // Substitua pelo nome da sua tabela
-
-    try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_NAME}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'apikey': SUPABASE_API_KEY,
-                'Authorization': `Bearer ${SUPABASE_API_KEY}`
-            }
-        });
-        console.log(response)
-
-        
-        if (!response.ok) {
-            throw new Error('Network response was not ok ' + response.statusText);
-        }
-
-        const data = await response.json();
-        console.log('Data fetched from Supabase:', data);
-    } catch (error) {
-        console.error('There has been a problem with your fetch operation:', error);
-    }
-}
-
-// Chamar a função para buscar dados do Supabase
-fetchFromSupabase();
-
 // Utility function to shuffle array elements
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -296,11 +224,3 @@ function shuffle(array) {
     }
     return array;
 }
-
-// function updateRanking(quizRanking) {
-//     // Atualizar o ranking global
-//     userResults = quizRanking;
-
-//     // Atualizar o top 3
-//     showRanking();
-// }
