@@ -29,7 +29,7 @@ async function getData() {
         console.log("Fetched data:", data);
 
         xquizData = data[0].jQuiz.questions; 
-        quizRanking = data[0].quizRanking;
+        quizRanking = JSON.parse(data[0].quizRanking); // Convert JSONB to array
 
         console.log("Quiz Data:", xquizData);
         console.log("Quiz Ranking:", quizRanking);
