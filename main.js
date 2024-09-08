@@ -185,6 +185,7 @@ function showRanking() {
 
     // Display the top 3 users from quizRanking
     quizRanking.slice(0, 3).forEach((result, index) => {
+        console.log(result);
         const resultText = document.createElement('div');
         resultText.className = 'ranking-entry';
         resultText.innerHTML = `${index + 1}. ${result.name} (${result.email}) - ${result.score} pontos em ${result.time} segundos`;
