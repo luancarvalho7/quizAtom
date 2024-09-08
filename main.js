@@ -184,6 +184,9 @@ function showRanking() {
     ranking.innerHTML = '<h2>Top 3 Ranking</h2>';
 
     // Display the top 3 users from quizRanking
+    if (!Array.isArray(quizRanking)) {
+        quizRanking = [quizRanking]; // Ensure quizRanking is an array
+    }
     quizRanking.slice(0, 3).forEach((result, index) => {
         console.log(result);
         const resultText = document.createElement('div');
