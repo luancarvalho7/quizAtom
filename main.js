@@ -6,13 +6,11 @@ function getURLParameter(name) {
 const userID = getURLParameter('uID');
 const videoUrl = getURLParameter('vUrl');
 const userName = getURLParameter('name');
-const userEmail = getURLParameter('email');
 
 // Log the results to verify
 console.log("UserID:", userID);
 console.log("videoUrl:", videoUrl);
 console.log("UserName:", userName);
-console.log("UserEmail:", userEmail);
 
 let xquizData = [];
 let quizRank = [];
@@ -183,8 +181,11 @@ async function sendResults() {
     // Send only the latest result
     const currentResult = userResults[userResults.length - 1]; // Get the last result added
 
+    console.log(currentResult)
+
     try {
-        const response = await fetch('https://n8nwebhook.iatom.site/webhook/setRanking', {
+        // First POST request
+        const response1 = await fetch('https://n8nwebhook.iatom.site/webhook/setRanking', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -192,28 +193,44 @@ async function sendResults() {
             body: JSON.stringify([currentResult]) // Send only the latest result
         });
 
-        if (!response.ok) {
-            throw new Error('Network response was not ok ' + response.statusText);
+        if (!response1.ok) {
+            throw new Error('Network response was not ok ' + response1.statusText);
         }
 
-        const result = await response.json();
-        console.log('Results successfully sent:', result);
+        const result1 = await response1.json();
+        console.log('Results successfully sent:', result1);
 
         // Check if the API response has updated ranking or "same"
-        if (result.ranking !== "same") {
+        if (result1.ranking !== "same") {
             // Update the UI with the new ranking if it's different
-            quizRank = result.ranking; // Assign the new ranking to quizRank
+            quizRank = result1.ranking; // Assign the new ranking to quizRank
             showRanking(); // Update the displayed ranking
         } else {
-            // Keep the original ranking (fetched in the first GET request)
             console.log("Ranking is unchanged. Keeping the existing ranking.");
             showRanking(); // Display the fetched ranking
         }
+
+        // Second POST request to quizProgressUpdate
+        const response2 = await fetch('https://n8nwebhook.iatom.site/webhook/quizProgressUpdate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify([currentResult]) // Send the same result to the second webhook
+        });
+
+        if (!response2.ok) {
+            throw new Error('Network response was not ok ' + response2.statusText);
+        }
+
+        const result2 = await response2.json();
+        console.log('Progress update successfully sent:', result2);
 
     } catch (error) {
         console.error('There has been a problem with your fetch operation:', error);
     }
 }
+
 
 function formatName(fullName) {
     if (!fullName) {
