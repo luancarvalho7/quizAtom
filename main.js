@@ -15,26 +15,25 @@ console.log("UserName:", userName);
 console.log("UserEmail:", userEmail);
 
 let xquizData = [];
-let quizRanking = [];
+let quizRank = [];
 
 async function getData() {
 
     try {
-        const response = await fetch(`https://n8nwebhook.iatom.site/webhook/findQuiz?url=${videoUrl}`);
+        const response = await fetch(`https://n8nwebhook.iatom.site/webhook/getUrl?url=${videoUrl}`);
         if (!response.ok) {
             throw new Error('Network response was not ok ' + response.statusText);
         }
         const data = await response.json();
-        console.log('oi')
 
         // Log the data to understand its structure
         console.log("Fetched data:", data);
 
-        xquizData = data[0].jQuiz.questions; 
-        quizRanking = Array.isArray(data[0].quizRanking) ? data[0].quizRanking : [data[0].quizRanking]; // Ensure quizRanking is an array
+        xquizData = data.jQuiz.questions; 
+        quizRank = Array.isArray(data.quizRank.ranking) ? data.quizRank.ranking : [data.quizRank.ranking]; // Ensure quizRank is an array
 
         console.log("Quiz Data:", xquizData);
-        console.log("Quiz Ranking:", quizRanking);
+        console.log("Quiz Ranking:", quizRank);
 
         // Start the quiz only after data is loaded
         startQuiz();
@@ -147,7 +146,7 @@ function showScore() {
     const timeTaken = (new Date() - startTime) / 1000;
 
     // Save the current user's result
-    userResults.push({ userName, userEmail, score, timeTaken });
+    userResults.push({ videoUrl, userName, userID, score, timeTaken });
 
     const scoreText = document.createElement('div');
     scoreText.id = 'score';
@@ -180,35 +179,17 @@ function showScore() {
     sendResults();
 }
 
-function showRanking() {
-    const ranking = document.createElement('div');
-    ranking.id = 'ranking';
-    ranking.innerHTML = '<h2>Top 3 Ranking</h2>';
-
-    // Display the top 3 users from quizRanking
-    if (!Array.isArray(quizRanking)) {
-        quizRanking = [quizRanking]; // Ensure quizRanking is an array
-    }
-    quizRanking.slice(0, 3).forEach((result, index) => {
-        console.log(result);
-        const resultText = document.createElement('div');
-        resultText.className = 'ranking-entry';
-        resultText.innerHTML = `${index + 1}. ${result.name} (${result.email}) - ${result.score} pontos em ${result.time} segundos`;
-        ranking.appendChild(resultText);
-    });
-
-    const quiz = document.getElementById('quiz');
-    quiz.appendChild(ranking);
-}
-
 async function sendResults() {
+    // Send only the latest result
+    const currentResult = userResults[userResults.length - 1]; // Get the last result added
+
     try {
-        const response = await fetch('https://webhook.workez.online/webhook/bc12ea5f-2b78-4401-97eb-82d307ae1cec', {
+        const response = await fetch('https://n8nwebhook.iatom.site/webhook/setRanking', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(userResults)
+            body: JSON.stringify([currentResult]) // Send only the latest result
         });
 
         if (!response.ok) {
@@ -217,10 +198,95 @@ async function sendResults() {
 
         const result = await response.json();
         console.log('Results successfully sent:', result);
+
+        // Check if the API response has updated ranking or "same"
+        if (result.ranking !== "same") {
+            // Update the UI with the new ranking if it's different
+            quizRank = result.ranking; // Assign the new ranking to quizRank
+            showRanking(); // Update the displayed ranking
+        } else {
+            // Keep the original ranking (fetched in the first GET request)
+            console.log("Ranking is unchanged. Keeping the existing ranking.");
+            showRanking(); // Display the fetched ranking
+        }
+
     } catch (error) {
         console.error('There has been a problem with your fetch operation:', error);
     }
 }
+
+function formatName(fullName) {
+    if (!fullName) {
+        return 'Unknown'; // Return a placeholder if the name is null or undefined
+    }
+    
+    const nameParts = fullName.split(' ');
+
+    // Get the first name
+    const firstName = nameParts[0];
+
+    // Get the last name (if available) and its first letter
+    const lastNameInitial = nameParts.length > 1 ? nameParts[nameParts.length - 1][0].toUpperCase() : '';
+
+    // Return the formatted name as "First L."
+    return lastNameInitial ? `${firstName} ${lastNameInitial}.` : firstName;
+}
+
+
+function showRanking() {
+    // Remove the old ranking if it exists
+    const existingRankingElement = document.getElementById('ranking');
+    if (existingRankingElement) {
+        existingRankingElement.remove(); 
+    }
+
+    // Create a new ranking container
+    const ranking = document.createElement('div');
+    ranking.id = 'ranking';
+    ranking.innerHTML = '<h2 class="ranking-title">Melhores Classificados</h2>';
+
+    // Create a container for all ranking entries
+    const rankingContainer = document.createElement('div');
+    rankingContainer.className = 'ranking-container'; // Unique container for all ranking entries
+
+    // Ensure quizRank is an array
+    if (!Array.isArray(quizRank)) {
+        quizRank = [quizRank];
+    }
+
+    // Add the top 3 users to the ranking container, but only if the userID is not null
+    quizRank.slice(0, 3).forEach((result, index) => {
+        if (result.userID) {  // Check if userID is valid
+            console.log(result);
+        
+            // Format the name
+            const formattedName = formatName(result.name);
+
+            // Create a ranking entry div
+            const entry = document.createElement('div');
+            entry.className = `ranking-entry ranking-${index + 1}`; // Add a class for ranking position (1st, 2nd, 3rd)
+
+            // HTML for the ranking entry
+            entry.innerHTML = `
+                <div class="ranking-position">#${index + 1}</div>
+                <div class="ranking-name">${formattedName}</div>
+                <div class="ranking-score">${result.score}/5</div>
+                <div class="ranking-time">${parseFloat(result.time).toFixed(2)} seg</div>
+            `;
+
+            rankingContainer.appendChild(entry); // Append each entry to the container
+        }
+    });
+
+    // Append the ranking container to the main ranking div
+    ranking.appendChild(rankingContainer);
+
+    // Append the ranking section to the quiz element
+    const quiz = document.getElementById('quiz');
+    quiz.appendChild(ranking);
+}
+
+
 
 // Utility function to shuffle array elements
 function shuffle(array) {

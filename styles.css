@@ -151,3 +151,77 @@ line-height: 0.8;
 .question-count {
     font-size: 18px;
 }
+
+/* Ranking Title */
+.ranking-title {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Ranking Container */
+.ranking-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Ranking Entry Styles */
+.ranking-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 18px;
+}
+
+/* First, Second, and Third Place Styles */
+.ranking-1 {
+    background-color: #1a1a1a;
+    border: 2px solid #f7c41f;
+}
+
+.ranking-2 {
+    background-color: #1a1a1a;
+    border: 2px solid #ccc;
+}
+
+.ranking-3 {
+    background-color: #1a1a1a;
+    border: 2px solid #c0392b;
+}
+
+/* Position, Name, Score, and Time Styles */
+.ranking-position {
+    font-size: 24px;
+    font-weight: bold;
+    color: #f7c41f;
+}
+
+.ranking-2 .ranking-position {
+    color: #ccc;
+}
+
+.ranking-3 .ranking-position {
+    color: #c0392b;
+}
+
+.ranking-name {
+    font-weight: bold;
+    flex-grow: 1;
+    text-align: left;
+    margin-left: 15px;
+}
+
+.ranking-score {
+    font-weight: bold;
+    text-align: right;
+}
+
+.ranking-time {
+    margin-left: 15px;
+    text-align: right;
+}
