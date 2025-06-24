@@ -4,21 +4,23 @@ function getURLParameter(name) {
 
 // Obter os parâmetros uID, vID, name e email
 const userID = getURLParameter('uID');
-const videoUrl = getURLParameter('vUrl');
+const customerZone = getURLParameter('customerZone');
+const videoExternalId = getURLParameter('videoExternalId');
 const userName = getURLParameter('name');
 
 // Log the results to verify
 console.log("UserID:", userID);
-console.log("videoUrl:", videoUrl);
+console.log("customerZone:", customerZone);
+console.log("videoExternalId:", videoExternalId);
 console.log("UserName:", userName);
 
 let xquizData = [];
 let quizRank = [];
-
+let idQuiz = '';
 async function getData() {
 
     try {
-        const response = await fetch(`https://n8nwebhook.iatom.site/webhook/getUrl?url=${videoUrl}`);
+        const response = await fetch(`https://n8nwebhook.iatom.site/webhook/getUrl?customerZone=${customerZone}&videoExternalId=${videoExternalId}`,);
         if (!response.ok) {
             throw new Error('Network response was not ok ' + response.statusText);
         }
@@ -29,7 +31,7 @@ async function getData() {
 
         xquizData = data.jQuiz.questions; 
         quizRank = Array.isArray(data.quizRank.ranking) ? data.quizRank.ranking : [data.quizRank.ranking]; // Ensure quizRank is an array
-
+        idQuiz = data.id;
         console.log("Quiz Data:", xquizData);
         console.log("Quiz Ranking:", quizRank);
 
@@ -144,7 +146,7 @@ function showScore() {
     const timeTaken = (new Date() - startTime) / 1000;
 
     // Save the current user's result
-    userResults.push({ videoUrl, userName, userID, score, timeTaken });
+    userResults.push({ idQuiz, userName, userID, score, timeTaken });
 
     const scoreText = document.createElement('div');
     scoreText.id = 'score';
